@@ -14,11 +14,16 @@ def init_db_command():
     click.echo("Connected to database")
 
 def init_app(app):
+    """This function is called everytime a new app instance is made.
+    """
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
 def get_db(table="xyz"):
     """Create a database object db using the application context 'g'.
+       This function also ensures that multiple call from the same
+       flask app will use the same connection to the database instead
+       of creating a new one everytime.
 
        Here 'db' is an object of the cassandraModules class and not
        an actual database connection. The connection is handled by the 
