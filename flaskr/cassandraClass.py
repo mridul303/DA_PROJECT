@@ -9,8 +9,7 @@ from collections import OrderedDict
 import os
 
 class CassandraModules:
-    def __init__(self,table): 
-        self.__table = table
+    def __init__(self): 
         try:
             self.__keyspace = os.environ['KEYSPACE']
             self.__contact_points =os.environ['CONTACT_POINTS'].split(",")
@@ -20,7 +19,11 @@ class CassandraModules:
             self.__cluster = Cluster(self.__contact_points)
             self.__session = self.__cluster.connect(self.__keyspace)
             
-            
+    def __del__(self):
+        if CassandraModules:
+            self.__cluster.shutdown()
+    
+    def select_table(name):
             """
                 Get the column names from the table schema and
                 check if table exists. If not then raise an error
@@ -28,16 +31,14 @@ class CassandraModules:
             try:
                 table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self.__keyspace}' AND table_name='{self.__table}'"
                 resultSet = self.__session.execute(table_columns)
+                self.__table = table
                 print("Connected") 
                 if not resultSet.current_rows:
                     raise NameError(f"Table name: '{self.__table}' not found")
             except NameError as err:
                 raise
     
-    def __del__(self):
-        if CassandraModules:
-            self.__cluster.shutdown()
-    
+   
     def closeConnection(self):
         self.__cluster.shutdown()
 
