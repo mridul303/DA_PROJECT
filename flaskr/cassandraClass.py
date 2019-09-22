@@ -7,7 +7,7 @@ import os
 from collections import OrderedDict
 
 from cassandra.cluster import Cluster
-from cassandra.query import dict_factory
+from cassandra.query import dict_factory, named_tuple_factory
 
 class CassandraModules:
     def __init__(self): 
@@ -47,6 +47,7 @@ class CassandraModules:
 
     def __create_query(self):
         table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self.__keyspace}' AND table_name='{self.__table}'"
+        self.__session.row_factory = named_tuple_factory
         resultSet = self.__session.execute(table_columns)
 
         """
@@ -55,6 +56,7 @@ class CassandraModules:
         """
         column_names_dict = OrderedDict()
         for column in resultSet.current_rows:
+            print(type(column))
             column_names_dict[column.column_name] = None
 
         # column_names :: col1, col2, col3, ...
