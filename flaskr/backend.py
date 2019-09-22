@@ -14,7 +14,8 @@ def init_db_command():
     click.echo("Connected to database")
 
 def init_app(app):
-    # This function is called everytime a new app instance is made.
+    # app.teardown_appcontext() function is called everytime an app instance is cleaning up after
+    # returning the response.
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
