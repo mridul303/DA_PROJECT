@@ -1,23 +1,46 @@
-from .cassandraClass import CassandraModules
 
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 
+from .cassandraClass import CassandraModules
+
+
+# The following code(enclosed within the multiline comment) is used if you want
+# to intialize the database with certain values, properties, table, etc.
+# You can use it, for example, to initialize the tables you would be using in
+# your project when you deploy the app for the first time. 
+# To use it, run the command:
+#
+#                            flask init-db
+#
+# The code has been commented out as after the intial use, you probably will
+# not be using the command again.
+# If you want to use it uncomment the init_db() and init_db_command() functions
+# and also the app.cli.add_command() line in the function init_app()
+"""
 def init_db():
     db = get_db()
+    db.execute_query("TRUNCATE user")
 
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
     init_db()
     click.echo("Connected to database")
+"""
 
 def init_app(app):
-    # app.teardown_appcontext() function is called everytime an app instance is cleaning up after
-    # returning the response.
+    """This function is used to register the current flask app with the
+    app.teardown_appcontext(). The teardown_appcontext() method is called
+    everytime the app instance is cleaning up after returning the response.
+    """
     app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
+
+    """The following line of code has been intentionally commented out. Read the
+       above to undersand why.
+    """
+    #app.cli.add_command(init_db_command)
 
 
 def get_db():
