@@ -1,8 +1,8 @@
-"""A class to provide basic CRUD operations.
-It takes in one argument for the __init__ method which is
-the table name. The Keyspace and Conact Points are set as
-environment variables.
-"""
+# A class to provide basic CRUD operations.
+# It takes in one argument for the __init__ method which is
+# the table name. The Keyspace and Conact Points are set as
+# environment variables.
+
 import os
 from collections import OrderedDict
 
@@ -31,9 +31,8 @@ class CassandraModules:
 
 
     def select_table(self, table):
-            """
-                Get the column names from the table schema and
-                check if table exists. If not then raise an error
+            """Get the column names from the table schema and
+               check if table exists. If not then raise an error
             """
             try:
                 table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self.__keyspace}' AND table_name='{table}'"
@@ -50,9 +49,8 @@ class CassandraModules:
         self.__session.row_factory = named_tuple_factory
         resultSet = self.__session.execute(table_columns)
 
-        """
-            Storing the column names in an ordered dictionary to preserve column positions
-            when inserting data --> INSERT INTO table (col1, col2, ...) VALUES (?, ?, ...)
+        """Storing the column names in an ordered dictionary to preserve column positions
+           when inserting data --> INSERT INTO table (col1, col2, ...) VALUES (?, ?, ...)
         """
         column_names_dict = OrderedDict()
         for column in resultSet.current_rows:
@@ -88,6 +86,7 @@ class CassandraModules:
 
 
     def execute_query(self, query):
+        """Execute the given query"""
         resultSet = None
         self.__session.row_factory = dict_factory
 

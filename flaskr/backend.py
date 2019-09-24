@@ -18,17 +18,17 @@ from .cassandraClass import CassandraModules
 # not be using the command again.
 # If you want to use it uncomment the init_db() and init_db_command() functions
 # and also the app.cli.add_command() line in the function init_app()
-"""
-def init_db():
-    db = get_db()
-    db.execute_query("TRUNCATE user")
 
-@click.command('init-db')
-@with_appcontext
-def init_db_command():
-    init_db()
-    click.echo("Connected to database")
-"""
+# def init_db():
+#     db = get_db()
+#     db.execute_query("TRUNCATE user")
+#
+# @click.command('init-db')
+# @with_appcontext
+# def init_db_command():
+#     init_db()
+#     click.echo("Connected to database")
+
 
 def init_app(app):
     """This function is used to register the current flask app with the

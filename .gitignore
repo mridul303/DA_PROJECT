@@ -2,3 +2,4 @@ environment.yml
 *.pyc
 __pycachce__/
 
+.vscode
