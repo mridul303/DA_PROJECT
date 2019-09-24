@@ -69,8 +69,8 @@ def login():
 @bp.before_app_request
 def load_logged_in_user():
     """Run this function before any request to check if user is already logged
-       in by checking the session id. Set the app context data based on weather
-       they are logged in or not.
+    in by checking the session id. Set the app context data based on weather
+    they are logged in or not.
     """
     user_id = session.get('user_id')
 

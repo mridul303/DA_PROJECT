@@ -32,7 +32,7 @@ class CassandraModules:
 
     def select_table(self, table):
             """Get the column names from the table schema and
-               check if table exists. If not then raise an error
+            check if table exists. If not then raise an error
             """
             try:
                 table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self.__keyspace}' AND table_name='{table}'"
@@ -50,7 +50,7 @@ class CassandraModules:
         resultSet = self.__session.execute(table_columns)
 
         """Storing the column names in an ordered dictionary to preserve column positions
-           when inserting data --> INSERT INTO table (col1, col2, ...) VALUES (?, ?, ...)
+        when inserting data --> INSERT INTO table (col1, col2, ...) VALUES (?, ?, ...)
         """
         column_names_dict = OrderedDict()
         for column in resultSet.current_rows:

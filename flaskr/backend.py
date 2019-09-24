@@ -38,20 +38,20 @@ def init_app(app):
     app.teardown_appcontext(close_db)
 
     """The following line of code has been intentionally commented out. Read the
-       above to undersand why.
+    above to undersand why.
     """
     #app.cli.add_command(init_db_command)
 
 
 def get_db():
     """Create a database object db using the application context 'g'.
-       This function also ensures that multiple call from the same
-       flask app will use the same connection to the database instead
-       of creating a new one everytime.
+    This function also ensures that multiple call from the same
+    flask app will use the same connection to the database instead
+    of creating a new one everytime.
 
-       Here 'db' is an object of the cassandraModules class and not
-       an actual database connection. The connection is handled by the 
-       class.
+    Here 'db' is an object of the cassandraModules class and not
+    an actual database connection. The connection is handled by the 
+    class.
     """
     if 'db' not in g:
         g.db = CassandraModules()

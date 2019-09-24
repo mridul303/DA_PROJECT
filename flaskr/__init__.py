@@ -5,8 +5,8 @@ from flask import Flask
 def create_app(test_config=None):
     """An Application Factory to create and configure the flask app
 
-       NOTE: Don't publish the actual SECRET_KEY when commiting
-       the code to github!!
+    NOTE: Don't publish the actual SECRET_KEY when commiting
+    the code to github!!
     """
 
     app = Flask(__name__, instance_relative_config=True)
