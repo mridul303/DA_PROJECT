@@ -11,43 +11,37 @@ from cassandra.query import dict_factory, named_tuple_factory
 
 class CassandraModules:
     def __init__(self): 
-        self.__table = None
+        self.table = None
         try:
-            self.__keyspace = os.environ['KEYSPACE']
-            self.__contact_points =os.environ['CONTACT_POINTS'].split(",")
+            self._keyspace = "key1" # os.environ['KEYSPACE']
+            self._contact_points = ["127.0.0.1"] # os.environ['CONTACT_POINTS'].split(",")
         except (KeyError) as err:
             print("KEY ERROR: ",err) 
         else:
-            self.__cluster = Cluster(self.__contact_points)
-            self.__session = self.__cluster.connect(self.__keyspace)
+            self._cluster = Cluster(self._contact_points)
+            self._session = self._cluster.connect(self._keyspace)
 
-    def __del__(self):
-        if not CassandraModules:
-            self.__cluster.shutdown()
+    def __call__(self, table):
+        try:
+            table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self._keyspace}' AND table_name='{table}'"
+            resultSet = self._session.execute(table_columns)
 
+            if not resultSet.current_rows:
+                raise NameError(f"Table name: '{self.table}' not found")
+
+            self.table = table
+        except NameError as err:
+            raise
+
+        return 
 
     def closeConnection(self):
-        self.__cluster.shutdown()
+        self._cluster.shutdown()
 
-
-    def select_table(self, table):
-            """Get the column names from the table schema and
-            check if table exists. If not then raise an error
-            """
-            try:
-                table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self.__keyspace}' AND table_name='{table}'"
-                resultSet = self.__session.execute(table_columns)
-                if not resultSet.current_rows:
-                    raise NameError(f"Table name: '{self.__table}' not found")
-                self.__table = table
-            except NameError as err:
-                raise
-
-
-    def __create_query(self):
-        table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self.__keyspace}' AND table_name='{self.__table}'"
-        self.__session.row_factory = named_tuple_factory
-        resultSet = self.__session.execute(table_columns)
+    def _create_query(self):
+        table_columns = f"SELECT column_name FROM system_schema.columns WHERE keyspace_name='{self._keyspace}' AND table_name='{self.table}'"
+        self._session.row_factory = named_tuple_factory
+        resultSet = self._session.execute(table_columns)
 
         """Storing the column names in an ordered dictionary to preserve column positions
         when inserting data --> INSERT INTO table (col1, col2, ...) VALUES (?, ?, ...)
@@ -63,15 +57,15 @@ class CassandraModules:
         placeholder = ("?,"*len(column_names_dict))[:-1]
 
         # final query to be used for insertion
-        query = f"INSERT INTO {self.__table} ({column_names}) VALUES({placeholder})"
+        query = f"INSERT INTO {self.table} ({column_names}) VALUES({placeholder})"
         return column_names_dict, query
 
 
     #INSERTING DATA INTO TABLE
     def insert(self, data):
         print("INSERT")
-        column_names_dict, query = self.__create_query()
-        prepared = self.__session.prepare(query) 
+        column_names_dict, query = self._create_query()
+        prepared = self._session.prepare(query) 
 
         for key, values in data.items():
             if isinstance(key, str):
@@ -80,7 +74,7 @@ class CassandraModules:
         print(column_names_dict)
         try:
             bound = prepared.bind(column_names_dict)
-            self.__session.execute(bound)
+            self._session.execute(bound)
         except Exception as err:
             print("ERROR INSERTING DATA : ",err)
 
@@ -88,10 +82,10 @@ class CassandraModules:
     def execute_query(self, query):
         """Execute the given query"""
         resultSet = None
-        self.__session.row_factory = dict_factory
+        self._session.row_factory = dict_factory
 
         try:
-            resultSet = self.__session.execute(query)
+            resultSet = self._session.execute(query)
         except:
             print("Error executing query ", query)
 
@@ -113,8 +107,8 @@ class CassandraModules:
                 else:
                     where.append(f"{key} = '{val}'")
 
-            query = f"UPDATE {self.__table} SET {','.join(what)} WHERE {','.join(where)}"
+            query = f"UPDATE {self.table} SET {','.join(what)} WHERE {','.join(where)}"
             try:
-                self.__session.execute(query)
+                self._session.execute(query)
             except:
                 print("ERROR UPDATING VALUES")

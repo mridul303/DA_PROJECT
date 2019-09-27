@@ -43,7 +43,7 @@ def init_app(app):
     #app.cli.add_command(init_db_command)
 
 
-def get_db():
+def get_db(table):
     """Create a database object db using the application context 'g'.
     This function also ensures that multiple call from the same
     flask app will use the same connection to the database instead
@@ -55,6 +55,8 @@ def get_db():
     """
     if 'db' not in g:
         g.db = CassandraModules()
+        g.db(table)
+
 
     return g.db
 
