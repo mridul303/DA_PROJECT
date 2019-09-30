@@ -2,6 +2,8 @@ language: python
 python:
   - "3.6"
   - "3.7"
+before_install:
+  - sudo apt-get install cassandra
 install:
   - pip install -r requirements.txt
 services:
