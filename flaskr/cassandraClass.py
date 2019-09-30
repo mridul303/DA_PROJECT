@@ -6,19 +6,40 @@
 import os
 from collections import OrderedDict
 
-from cassandra.cluster import Cluster
+from cassandra.cluster import Cluster, ExecutionProfile
+from cassandra.policies import DCAwareRoundRobinPolicy
 from cassandra.query import dict_factory, named_tuple_factory
 
+
 class CassandraModules:
-    def __init__(self): 
+    def __init__(self, TESTING=None):
         self.table = None
+        profiles = None
         try:
-            self._keyspace = "key1" # os.environ['KEYSPACE']
-            self._contact_points = ["127.0.0.1"] # os.environ['CONTACT_POINTS'].split(",")
+            # Set the environment variables within your virtual environment
+            # having the following names:
+            # For production:
+            #               KEYSPACE='key1'
+            #               CONTACT_POINTS='127.0.1'
+            #
+            # For testing:
+            #               TEST_KEYSPACE='key2'
+            #               TEST_CONTACT_POINTS='127.0.1'
+            # Activate the environment variable based on weather TESTING is
+            # True or False
+            if TESTING is None:
+                self._keyspace = os.environ['KEYSPACE']
+                self._contact_points = os.environ['CONTACT_POINTS'].split(",")
+            else:
+                self._keyspace = os.environ['TEST_KEYSPACE']
+                self._contact_points = os.environ['TEST_CONTACT_POINTS'].split(",")
         except (KeyError) as err:
-            print("KEY ERROR: ",err) 
+            print("KEY ERROR: ", err)
         else:
-            self._cluster = Cluster(self._contact_points)
+            policy = ExecutionProfile(load_balancing_policy=DCAwareRoundRobinPolicy())
+            self._cluster = Cluster(self._contact_points,
+                                    execution_profiles=profiles
+                                    )
             self._session = self._cluster.connect(self._keyspace)
 
     def __call__(self, table):
@@ -60,10 +81,8 @@ class CassandraModules:
         query = f"INSERT INTO {self.table} ({column_names}) VALUES({placeholder})"
         return column_names_dict, query
 
-
-    #INSERTING DATA INTO TABLE
+    # INSERTING DATA INTO TABLE
     def insert(self, data):
-        print("INSERT")
         column_names_dict, query = self._create_query()
         prepared = self._session.prepare(query) 
 
@@ -71,19 +90,16 @@ class CassandraModules:
             if isinstance(key, str):
                 key = key.lower()
             column_names_dict[key] = values
-        print(column_names_dict)
         try:
             bound = prepared.bind(column_names_dict)
             self._session.execute(bound)
         except Exception as err:
             print("ERROR INSERTING DATA : ",err)
 
-
     def execute_query(self, query):
         """Execute the given query"""
         resultSet = None
         self._session.row_factory = dict_factory
-
         try:
             resultSet = self._session.execute(query)
         except:

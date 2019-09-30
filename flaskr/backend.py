@@ -57,8 +57,8 @@ def get_db(table):
         g.db = CassandraModules()
         g.db(table)
 
-
     return g.db
+
 
 def close_db(e=None):
     db = g.pop('db', None)
