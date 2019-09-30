@@ -5,9 +5,8 @@ python:
   - "3.6"
   - "3.7"
 before_install:
-  - curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
-  - sudo apt-get update
-  - sudo apt-get install cassandra
+  - sudo rm -rf /var/lib/cassandra/*
+  - wget http://apachemirror.wuchna.com/cassandra/3.11.4/apache-cassandra-3.11.4-bin.tar.gz && tar -xvzf apache-cassandra-3.11.4-bin.tar.gz && sudo sh apache-cassandra-3.11.4/bin/cassandra
 install:
   - pip install -r requirements.txt
 services:
