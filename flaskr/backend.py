@@ -6,7 +6,7 @@ from flask.cli import with_appcontext
 from .cassandraClass import CassandraModules
 
 
-# The following code(enclosed within the multiline comment) is used if you want
+# The following code is used if you want
 # to intialize the database with certain values, properties, table, etc.
 # You can use it, for example, to initialize the tables you would be using in
 # your project when you deploy the app for the first time. 
@@ -21,8 +21,11 @@ from .cassandraClass import CassandraModules
 
 # def init_db():
 #     db = get_db()
+#     db.execute_query("CREATE TABLE IF NOT EXISTS user (username text PRIMARY KEY, password text, id uuid)")
+#     db.execute_query("CREATE TABLE IF NOT EXISTS user (id uuid PRIMARY KEY, username text)")
 #     db.execute_query("TRUNCATE user")
-#
+#     db.execute_query("TRUNCATE session")
+
 # @click.command('init-db')
 # @with_appcontext
 # def init_db_command():
@@ -40,7 +43,7 @@ def init_app(app):
     """The following line of code has been intentionally commented out. Read the
     above to undersand why.
     """
-    #app.cli.add_command(init_db_command)
+    # app.cli.add_command(init_db_command)
 
 
 def get_db(table):
