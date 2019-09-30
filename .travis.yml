@@ -2,11 +2,10 @@ dis: bionic
 
 language: python
 python:
-  - "3.6"
   - "3.7"
 before_install:
-  - sudo rm -rf /var/lib/cassandra/*
-  - wget http://apachemirror.wuchna.com/cassandra/3.11.4/apache-cassandra-3.11.4-bin.tar.gz && tar -xvzf apache-cassandra-3.11.4-bin.tar.gz && sudo sh apache-cassandra-3.11.4/bin/cassandra
+  - sudo sh -c "echo 'JVM_OPTS=\"$JVM_OPTS -Djava.net.preferIPv4Stack=false\"' >> /usr/local/cassandra/conf/cassandra-env.sh"
+  - sudo service cassandra start
 install:
   - pip install -r requirements.txt
 services:
